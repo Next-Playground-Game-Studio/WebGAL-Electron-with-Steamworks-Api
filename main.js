@@ -1,4 +1,5 @@
-const {app, BrowserWindow, Menu} = require('electron');
+const { app, BrowserWindow, globalShortcut, Menu } = require('electron');
+const steamworks = require('steamworks.js')
 
 /**
  * 关闭默认菜单栏
@@ -22,10 +23,25 @@ app.whenReady().then(() => {
 const createWindow = () => {
     const win = new BrowserWindow({
         width: 1600,
-        height: 900
+        height: 900,
+        webPreferences: {
+            contextIsolation: false,
+            nodeIntegration: true
+        }
     })
 
+    if (process.env.SteamTenfoot) {
+        win.setFullScreen(true)
+    } else {
+        win.maximize()
+    }
+
     win.loadFile('./public/index.html').then(r => console.log(r));
+
+    // 注册快捷键 Ctrl + F12 切换开发者工具
+    /* globalShortcut.register("Ctrl+F12", () => {
+        win.isFocused() && win.webContents.toggleDevTools();
+    }); */
 }
 
 /**
@@ -34,3 +50,5 @@ const createWindow = () => {
 app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') app.quit()
 })
+
+steamworks.electronEnableSteamOverlay()
